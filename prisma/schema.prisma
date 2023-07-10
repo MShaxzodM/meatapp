@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id             Int       @id @default(autoincrement())
+  name           String
+  surname        String
+  phone          String
+  work           String
+  jshr           String
+  prepaid_date   DateTime  @default(now()) @db.Date
+  calculate_date DateTime  @default(now()) @db.Date
+  orders         Order[]
+  payment        payment[]
+  buy            buy[]
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  client     Client   @relation(fields: [clientId], references: [id])
+  clientId   Int
+  date       DateTime @default(now()) @db.Date
+  meatType   MeatType @relation(fields: [meatTypeId], references: [id])
+  meatTypeId Int
+  quantity   Int
+}
+
+model MeatType {
+  id     Int     @id @default(autoincrement())
+  name   String
+  price  Int
+  orders Order[]
+  buy    buy[]
+}
+
+model payment {
+  id       Int      @id @default(autoincrement())
+  type     String
+  client   Client   @relation(fields: [clientId], references: [id])
+  clientId Int
+  date     DateTime @default(now()) @db.Date
+  sum      Int
+}
+
+model buy {
+  id         Int      @id @default(autoincrement())
+  client     Client   @relation(fields: [clientId], references: [id])
+  clientId   Int
+  date       DateTime @default(now()) @db.Date
+  meatType   MeatType @relation(fields: [meatTypeId], references: [id])
+  meatTypeId Int
+  quantity   Int
+}
