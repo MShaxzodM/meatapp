@@ -12,32 +12,7 @@ router.post("/", async (req, res) => {
         res.send(err);
     }
 });
-router.put("/", async (req, res) => {
-    try {
-        const id = parseInt(req.body.id);
-        const updated = await prisma.meatType.update({
-            data: req.body,
-            where: { id: id },
-        });
-        res.send(updated);
-    } catch (err) {
-        res.send(err);
-    }
-});
 
-router.delete("/", async (req, res) => {
-    try {
-        const id = parseInt(req.body.id);
-        const deleted = await prisma.meatType.delete({
-            where: {
-                id: id,
-            },
-        });
-        res.send(deleted);
-    } catch {
-        res.send("Not deleted");
-    }
-});
 router.get("/", async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 7;
@@ -60,5 +35,32 @@ router.get("/", async (req, res) => {
         res.send(err);
     }
 });
+router.put("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        const updated = await prisma.meatType.update({
+            data: req.body,
+            where: { id: id },
+        });
+        res.send(updated);
+    } catch (err) {
+        res.send(err);
+    }
+});
 
+router.delete("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        await prisma.order.deleteMany({ where: { meatTypeId: id } });
+        await prisma.buy.deleteMany({ where: { meatTypeId: id } });
+        const deleted = await prisma.meatType.delete({
+            where: {
+                id: id,
+            },
+        });
+        res.send(deleted);
+    } catch {
+        res.send("Not deleted");
+    }
+});
 export default router;

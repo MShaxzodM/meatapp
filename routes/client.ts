@@ -14,7 +14,36 @@ router.post("/", async (req, res) => {
         res.send(err);
     }
 });
-
+router.put("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        req.body.prepaid_date = req.body.prepaid_date
+            ? new Date(req.body.prepaid_date)
+            : undefined;
+        req.body.calculate_date = req.body.calculate_date
+            ? new Date(req.body.calculate_date)
+            : undefined;
+        const client = await prisma.client.update({
+            data: req.body,
+            where: { id: id },
+        });
+        res.send(client);
+    } catch (err) {
+        res.send(err);
+    }
+});
+router.delete("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        await prisma.buy.deleteMany({ where: { clientId: id } });
+        await prisma.payment.deleteMany({ where: { clientId: id } });
+        await prisma.order.deleteMany({ where: { clientId: id } });
+        const deleted = await prisma.client.delete({ where: { id: id } });
+        res.send(deleted);
+    } catch (err) {
+        res.send("Not deleted");
+    }
+});
 router.get("/", async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 7;

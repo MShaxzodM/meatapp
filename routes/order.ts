@@ -36,4 +36,34 @@ router.get("/", async (req, res) => {
         res.send(err);
     }
 });
+
+router.put("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        req.body.date = req.body.ate ? new Date(req.body.date) : undefined;
+        req.body.meatTypeId = req.body.meatTypeId
+            ? parseInt(req.body.meatTypeId)
+            : undefined;
+        req.body.clientId = req.body.clientId
+            ? parseInt(req.body.clientId)
+            : undefined;
+        const order = await prisma.order.update({
+            data: req.body,
+            where: { id: id },
+        });
+        res.send(order);
+    } catch (err) {
+        res.send("Cant update order");
+    }
+});
+
+router.delete("/", async (req, res) => {
+    try {
+        const id = parseInt(req.body.id);
+        const deleted = await prisma.order.delete({ where: { id: id } });
+        res.send(deleted);
+    } catch (err) {
+        res.send("cant delete");
+    }
+});
 export default router;
